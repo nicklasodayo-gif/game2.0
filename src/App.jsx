@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import config, { getCSSVariables } from './config';
+
+import { getConfig, getCSSVariables } from './config';
 
 // Components
 import {
@@ -34,152 +35,177 @@ import './styles/index.css';
  * Main App Component
  */
 function App() {
+  // Read active brand from URL
+  const params = new URLSearchParams(window.location.search);
+  const brand = params.get('brand') || 'redgiant';
+
+  // Load active brand configuration
+  const config = getConfig(brand);
+
   return (
     <BrowserRouter>
-      <CSSVariables />
+      <CSSVariables config={config} />
+
       <Routes>
-        <Route path="/" element={<GamePage />} />
-        <Route path="/leaderboard" element={<LeaderboardPage />} />
+        <Route
+          path="/"
+          element={<GamePage config={config} />}
+        />
+
+        <Route
+          path="/leaderboard"
+          element={<LeaderboardPage config={config} />}
+        />
       </Routes>
     </BrowserRouter>
   );
 }
 
 /**
- * Game Page - Main game flow
+ * Game Page
  */
-function GamePage() {
-  // Game states
-  const [gameState, setGameState] = useState('attract'); // attract, playing, won, leadCapture
+function GamePage({ config }) {
+  const [gameState, setGameState] = useState('attract');
   const [gameKey, setGameKey] = useState(0);
-  
-  // Statistics
-  const { recordWin, recordLead, recordIdle, getTopScores } = useStatistics();
-  
-  // Sound hook
-  const { isMuted, toggleMute, loadSound, playSound } = useSound();
-  
-  // Fullscreen hook
-  const { isFullscreen, isSupported, toggle: toggleFullscreen } = useFullscreen();
-  
-  // Timer
-  const { time, formattedTime, isRunning, start, stop, reset } = useGameTimer({
+  const [moves, setMoves] = useState(0);
+
+  const { recordWin, recordLead, recordIdle } = useStatistics();
+
+  const {
+    isMuted,
+    toggleMute,
+    loadSound,
+    playSound,
+  } = useSound();
+
+  const {
+    isFullscreen,
+    isSupported,
+    toggle: toggleFullscreen,
+  } = useFullscreen();
+
+  const {
+    time,
+    isRunning,
+    start,
+    stop,
+    reset,
+  } = useGameTimer({
     maxTime: config.settings.targetTime,
   });
-  
-  // Game reset hook
-  const { gameKey: puzzleKey } = useGameReset();
-  
-  // Move count
-  const [moves, setMoves] = useState(0);
-  
-  // Load sounds
+
+  useGameReset();
+
   useEffect(() => {
     if (config.sounds.move) loadSound('move', config.sounds.move);
     if (config.sounds.win) loadSound('win', config.sounds.win);
-  }, [loadSound]);
-  
-  // Start game
+  }, [config, loadSound]);
+
   const handleStart = useCallback(() => {
-    if (gameState === 'attract') {
-      setMoves(0);
-      reset();
-      setGameKey(prev => prev + 1);
-      setGameState('playing');
-    }
-  }, [gameState, reset]);
-  
-  // Handle tile move
-  const handleMove = useCallback((newMoves) => {
-    setMoves(newMoves);
-    if (!isRunning) {
-      start();
-    }
-  }, [isRunning, start]);
-  
-  // Handle move count change
-  const handleMoveCount = useCallback((newMoves) => {
-    setMoves(newMoves);
+    setMoves(0);
+    reset();
+    setGameKey((prev) => prev + 1);
+    setGameState('playing');
+  }, [reset]);
+
+  const handleMove = useCallback(
+    (newMoves) => {
+      setMoves(newMoves);
+
+      if (!isRunning) {
+        start();
+      }
+    },
+    [isRunning, start]
+  );
+
+  const handleMoveCount = useCallback((count) => {
+    setMoves(count);
   }, []);
-  
-  // Handle win
-  const handleWin = useCallback((finalMoves) => {
-    stop();
-    setMoves(finalMoves);
-    recordWin({
-      moves: finalMoves,
-      time,
-      gridSize: config.settings.gridSize,
-    });
-    setGameState('won');
-  }, [stop, time, recordWin]);
-  
-  // Play again
+
+  const handleWin = useCallback(
+    (finalMoves) => {
+      stop();
+
+      recordWin({
+        moves: finalMoves,
+        time,
+        gridSize: config.settings.gridSize,
+      });
+
+      setMoves(finalMoves);
+      setGameState('won');
+    },
+    [config, stop, time, recordWin]
+  );
+
   const handleContinue = useCallback(() => {
     setMoves(0);
     reset();
-    setGameKey(prev => prev + 1);
+    setGameKey((prev) => prev + 1);
     setGameState('playing');
   }, [reset]);
-  
-  // Claim prize (show lead capture)
+
   const handleClaimPrize = useCallback(() => {
     setGameState('leadCapture');
   }, []);
-  
-  // Handle lead submission
-  const handleLeadSubmit = useCallback((leadData) => {
-    addLead(leadData);
-    recordLead();
-    
-    // Return to attract after delay
-    setTimeout(() => {
-      setGameState('attract');
-    }, 2000);
-  }, [recordLead]);
-  
-  // Handle lead skip
+
+  const handleLeadSubmit = useCallback(
+    (lead) => {
+      addLead(lead);
+      recordLead();
+
+      setTimeout(() => {
+        setGameState('attract');
+      }, 2000);
+    },
+    [recordLead]
+  );
+
   const handleLeadSkip = useCallback(() => {
     setGameState('attract');
   }, []);
-  
-  // Handle idle timeout
+
   const handleIdle = useCallback(() => {
-    if (gameState !== 'attract') {
-      stop();
-      reset();
-      recordIdle();
-      setGameState('attract');
-    }
-  }, [gameState, stop, reset, recordIdle]);
-  
-  // Play sound helper
-  const playSoundEffect = useCallback((soundName) => {
-    if (!isMuted) {
-      playSound(soundName);
-    }
-  }, [isMuted, playSound]);
+    stop();
+    reset();
+    recordIdle();
+    setGameState('attract');
+  }, [stop, reset, recordIdle]);
+
+  const playSoundEffect = useCallback(
+    (name) => {
+      if (!isMuted) {
+        playSound(name);
+      }
+    },
+    [isMuted, playSound]
+  );
 
   return (
-    <div 
+    <div
       className="min-h-screen overflow-hidden select-none"
       style={{
         fontFamily: config.fonts.body,
-        background: `linear-gradient(135deg, ${config.theme.background} 0%, ${config.theme.backgroundLight} 100%)`,
+        background: `linear-gradient(
+          135deg,
+          ${config.theme.background},
+          ${config.theme.backgroundLight}
+        )`,
       }}
     >
-      {/* Sound controller */}
-      <SoundController isMuted={isMuted} onToggle={toggleMute} />
-      
-      {/* Fullscreen button */}
+      <SoundController
+        isMuted={isMuted}
+        onToggle={toggleMute}
+      />
+
       {isSupported && (
-        <FullscreenButton 
-          isFullscreen={isFullscreen} 
-          onToggle={toggleFullscreen} 
+        <FullscreenButton
+          isFullscreen={isFullscreen}
+          onToggle={toggleFullscreen}
         />
       )}
 
-      {/* Idle timer */}
       <IdleTimer
         isActive={gameState !== 'attract'}
         onIdle={handleIdle}
@@ -188,10 +214,12 @@ function GamePage() {
         <div />
       </IdleTimer>
 
-      {/* Main content */}
       <AnimatePresence mode="wait">
         {gameState === 'attract' && (
-          <AttractMode key="attract" onStart={handleStart} />
+          <AttractMode
+            key="attract"
+            onStart={handleStart}
+          />
         )}
 
         {(gameState === 'playing' || gameState === 'won') && (
@@ -210,14 +238,16 @@ function GamePage() {
               key={gameKey}
               gridSize={config.settings.gridSize}
               onMove={handleMove}
-              onWin={handleWin}
               onMoveCount={handleMoveCount}
+              onWin={handleWin}
               gameKey={gameKey}
               disabled={gameState === 'won'}
               sound={playSoundEffect}
             />
 
-            <GameFooter instruction={config.game.instruction} />
+            <GameFooter
+              instruction={config.game.instruction}
+            />
           </div>
         )}
 
@@ -247,16 +277,22 @@ function GamePage() {
 /**
  * Leaderboard Page
  */
-function LeaderboardPage() {
+function LeaderboardPage({ config }) {
   const navigate = useNavigate();
+
   const { getTopScores } = useStatistics();
+
   const scores = getTopScores('time', 20);
 
   return (
-    <div 
+    <div
       className="min-h-screen p-4"
       style={{
-        background: `linear-gradient(135deg, ${config.theme.background} 0%, ${config.theme.backgroundLight} 100%)`,
+        background: `linear-gradient(
+          135deg,
+          ${config.theme.background},
+          ${config.theme.backgroundLight}
+        )`,
       }}
     >
       <Leaderboard
@@ -269,13 +305,12 @@ function LeaderboardPage() {
 }
 
 /**
- * CSS Variables Component
+ * CSS Variables
  */
-function CSSVariables() {
+function CSSVariables({ config }) {
   const variables = getCSSVariables(config);
-  const style = { style: variables };
-  
-  return <div {...style} />;
+
+  return <div style={variables} />;
 }
 
 export default App;
