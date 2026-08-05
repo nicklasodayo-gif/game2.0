@@ -1,8 +1,12 @@
 /**
  * Coca-Cola Brand Configuration
- * 
+ *
  * Complete branding for Coca-Cola activation game.
- * Switch to this config by: import config from './cocaCola'
+ *
+ * Supports:
+ * import config from './cocaCola'
+ * OR
+ * import { cocacolaConfig } from './cocaCola'
  */
 
 const cocacolaConfig = {
@@ -10,7 +14,7 @@ const cocacolaConfig = {
   client: "Coca-Cola",
   clientSlug: "cocacola",
 
-  // Theme colors (CSS variables will be generated)
+  // Theme colors
   theme: {
     primary: "#E41E26",
     primaryDark: "#B8001C",
@@ -48,7 +52,7 @@ const cocacolaConfig = {
     howToPlay: "Swipe tiles to arrange them in order",
   },
 
-  // Button text
+  // Buttons
   buttons: {
     play: "PLAY NOW",
     retry: "TRY AGAIN",
@@ -79,14 +83,20 @@ const cocacolaConfig = {
   lead: {
     title: "Enter Your Details",
     subtitle: "to claim your prize",
-    consentText: "Your details will be used for prize communication only. By submitting, you agree to our terms and conditions.",
+
+    consentText:
+      "Your details will be used for prize communication only. By submitting, you agree to our terms and conditions.",
+
     namePlaceholder: "Your Full Name",
     phonePlaceholder: "Phone Number",
     emailPlaceholder: "Email Address (optional)",
     companyPlaceholder: "Company (optional)",
+
     consentLabel: "I agree to the terms and conditions",
+
     successTitle: "Entry Submitted!",
-    successMessage: "Good luck! We'll contact you if you win.",
+    successMessage:
+      "Good luck! We'll contact you if you win.",
   },
 
   // Timer labels
@@ -100,24 +110,36 @@ const cocacolaConfig = {
 
   // Game settings
   settings: {
-    gridSize: 3,           // 3 for 3x3, 4 for 4x4
-    targetTime: 60,        // Target completion time in seconds
-    maxTime: 180,          // Maximum time allowed
-    idleTimeout: 25,        // Seconds before attract mode
-    shuffleMoves: 50,       // Number of shuffle moves
+    gridSize: 3,
+    targetTime: 60,
+    maxTime: 180,
+    idleTimeout: 25,
+    shuffleMoves: 50,
   },
 
   // Difficulty settings
   difficulty: {
-    easy: { gridSize: 3, targetTime: 90 },
-    normal: { gridSize: 3, targetTime: 60 },
-    hard: { gridSize: 4, targetTime: 120 },
+    easy: {
+      gridSize: 3,
+      targetTime: 90,
+    },
+
+    normal: {
+      gridSize: 3,
+      targetTime: 60,
+    },
+
+    hard: {
+      gridSize: 4,
+      targetTime: 120,
+    },
   },
 
   // Sound settings
   sounds: {
     enabled: true,
     volume: 0.7,
+
     move: "/sounds/tile-move.mp3",
     win: "/sounds/coke-win.mp3",
     click: "/sounds/click.mp3",
@@ -128,11 +150,26 @@ const cocacolaConfig = {
   // Visual settings
   visuals: {
     backgroundPattern: "gradient",
+
     particles: {
       enabled: true,
-      colors: ["#E41E26", "#FFFFFF", "#F40009", "#FFD700"],
+
+      colors: [
+        "#E41E26",
+        "#FFFFFF",
+        "#F40009",
+        "#FFD700",
+      ],
     },
-    confettiColors: ["#E41E26", "#FFFFFF", "#F40009", "#FFD700", "#00C853"],
+
+    confettiColors: [
+      "#E41E26",
+      "#FFFFFF",
+      "#F40009",
+      "#FFD700",
+      "#00C853",
+    ],
+
     animations: {
       tileMove: 150,
       screenTransition: 300,
@@ -149,10 +186,31 @@ const cocacolaConfig = {
 
   // Social sharing
   social: {
-    shareText: "I just completed the Coca-Cola Puzzle Challenge! 🎉",
-    shareUrl: "https://coke.com/puzzle",
-    hashtag: "#CokePuzzle",
+    shareText:
+      "I just completed the Coca-Cola Puzzle Challenge! 🎉",
+
+    shareUrl:
+      "https://coke.com/puzzle",
+
+    hashtag:
+      "#CokePuzzle",
   },
 };
+
+
+/*
+|--------------------------------------------------------------------------
+| Exports
+|--------------------------------------------------------------------------
+|
+| Named export required by:
+| src/config/index.js
+|
+| Default export kept for:
+| import config from './cocaCola'
+|
+*/
+
+export { cocacolaConfig };
 
 export default cocacolaConfig;

@@ -1,11 +1,18 @@
 /**
  * Demo Brand Configuration (Template)
- * 
+ *
  * This is a template showing all available configuration options.
- * Use as a reference when creating new brand configs.
+ *
+ * Supports:
+ * import config from './demoBrand'
+ *
+ * OR
+ *
+ * import { demoConfig } from './demoBrand'
  */
 
 const demoConfig = {
+
   // Client identification
   client: "Demo Brand",
   clientSlug: "demo",
@@ -26,27 +33,41 @@ const demoConfig = {
     error: "#EF4444",
   },
 
+
   // Typography
   fonts: {
     display: "'Poppins', sans-serif",
     body: "'Inter', sans-serif",
   },
 
+
   // Logo paths
   logo: "/logos/demo-logo.svg",
   logoWhite: "/logos/demo-logo-white.svg",
   logoAlt: "/logos/demo-logo-alt.svg",
 
+
   // Game UI text
   game: {
     title: "Brand Puzzle Challenge",
     subtitle: "Your Tagline Here",
-    instruction: "Tap tiles to slide them into order",
-    instructionAlt: "Complete before time runs out!",
-    prize: "Win Exciting Prizes!",
-    prizeDetails: "Complete the puzzle for your chance to win",
-    howToPlay: "Tap tiles to swap with empty space",
+
+    instruction:
+      "Tap tiles to slide them into order",
+
+    instructionAlt:
+      "Complete before time runs out!",
+
+    prize:
+      "Win Exciting Prizes!",
+
+    prizeDetails:
+      "Complete the puzzle for your chance to win",
+
+    howToPlay:
+      "Tap tiles to swap with empty space",
   },
+
 
   // Button text
   buttons: {
@@ -58,36 +79,74 @@ const demoConfig = {
     submit: "SUBMIT",
   },
 
+
   // Attract mode
   attract: {
     title: "TAP TO PLAY",
-    subtitle: "Instructions here",
-    instruction: "Touch anywhere to start",
-    tagline: "Your Brand Tagline",
+
+    subtitle:
+      "Instructions here",
+
+    instruction:
+      "Touch anywhere to start",
+
+    tagline:
+      "Your Brand Tagline",
   },
+
 
   // Win screen
   win: {
-    title: "CONGRATULATIONS!",
-    subtitle: "Puzzle Solved!",
-    message: "You're entered to win",
-    perfectTime: "Amazing speed!",
-    messageAlt: "Well done!",
+    title:
+      "CONGRATULATIONS!",
+
+    subtitle:
+      "Puzzle Solved!",
+
+    message:
+      "You're entered to win",
+
+    perfectTime:
+      "Amazing speed!",
+
+    messageAlt:
+      "Well done!",
   },
+
 
   // Lead capture
   lead: {
-    title: "Enter Your Details",
-    subtitle: "to claim your prize",
-    consentText: "Your details will only be used for this competition.",
-    namePlaceholder: "Full Name",
-    phonePlaceholder: "Phone Number",
-    emailPlaceholder: "Email (optional)",
-    companyPlaceholder: "Company (optional)",
-    consentLabel: "I agree to the terms",
-    successTitle: "Entry Submitted!",
-    successMessage: "Good luck!",
+    title:
+      "Enter Your Details",
+
+    subtitle:
+      "to claim your prize",
+
+    consentText:
+      "Your details will only be used for this competition.",
+
+    namePlaceholder:
+      "Full Name",
+
+    phonePlaceholder:
+      "Phone Number",
+
+    emailPlaceholder:
+      "Email (optional)",
+
+    companyPlaceholder:
+      "Company (optional)",
+
+    consentLabel:
+      "I agree to the terms",
+
+    successTitle:
+      "Entry Submitted!",
+
+    successMessage:
+      "Good luck!",
   },
+
 
   // Timer labels
   labels: {
@@ -98,6 +157,7 @@ const demoConfig = {
     score: "SCORE",
   },
 
+
   // Game settings
   settings: {
     gridSize: 3,
@@ -107,52 +167,138 @@ const demoConfig = {
     shuffleMoves: 50,
   },
 
+
   // Difficulty settings
   difficulty: {
-    easy: { gridSize: 3, targetTime: 90 },
-    normal: { gridSize: 3, targetTime: 60 },
-    hard: { gridSize: 4, targetTime: 120 },
+
+    easy: {
+      gridSize: 3,
+      targetTime: 90,
+    },
+
+    normal: {
+      gridSize: 3,
+      targetTime: 60,
+    },
+
+    hard: {
+      gridSize: 4,
+      targetTime: 120,
+    },
+
   },
+
 
   // Sound settings
   sounds: {
+
     enabled: true,
+
     volume: 0.6,
-    move: "/sounds/tile-move.mp3",
-    win: "/sounds/win.mp3",
-    click: "/sounds/click.mp3",
-    attract: "/sounds/attract.mp3",
-    countdown: "/sounds/countdown.mp3",
+
+    move:
+      "/sounds/tile-move.mp3",
+
+    win:
+      "/sounds/win.mp3",
+
+    click:
+      "/sounds/click.mp3",
+
+    attract:
+      "/sounds/attract.mp3",
+
+    countdown:
+      "/sounds/countdown.mp3",
+
   },
+
 
   // Visual settings
   visuals: {
-    backgroundPattern: "gradient",
+
+    backgroundPattern:
+      "gradient",
+
+
     particles: {
+
       enabled: true,
-      colors: ["#3B82F6", "#10B981", "#F59E0B", "#EF4444"],
+
+      colors: [
+        "#3B82F6",
+        "#10B981",
+        "#F59E0B",
+        "#EF4444",
+      ],
+
     },
-    confettiColors: ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#FFFFFF"],
+
+
+    confettiColors: [
+      "#3B82F6",
+      "#10B981",
+      "#F59E0B",
+      "#EF4444",
+      "#FFFFFF",
+    ],
+
+
     animations: {
+
       tileMove: 150,
+
       screenTransition: 300,
+
       attractFloat: 3000,
+
     },
+
   },
+
 
   // Touch feedback
   touch: {
+
     scale: 0.95,
+
     opacity: 0.8,
+
     duration: 100,
+
   },
+
 
   // Social sharing
   social: {
-    shareText: "I just completed the puzzle challenge! 🎮",
-    shareUrl: "https://example.com/challenge",
-    hashtag: "#PuzzleChallenge",
+
+    shareText:
+      "I just completed the puzzle challenge! 🎮",
+
+    shareUrl:
+      "https://example.com/challenge",
+
+    hashtag:
+      "#PuzzleChallenge",
+
   },
+
 };
+
+
+/*
+|--------------------------------------------------------------------------
+| Exports
+|--------------------------------------------------------------------------
+|
+| Named export:
+| Used by src/config/index.js
+|
+| Default export:
+| Allows direct imports
+|
+*/
+
+export { demoConfig };
 
 export default demoConfig;

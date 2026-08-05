@@ -1,32 +1,38 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
- * useFullscreen - Custom hook for fullscreen mode management
- * 
- * @param {Object} options - Fullscreen options
- * @param {string} options.element - CSS selector for element to fullscreen
+ * useFullscreen - Custom hook for fullscreen management
+ *
+ * @param {Object} options
+ * @param {string|HTMLElement} options.element - Element selector or HTMLElement
  * @param {boolean} options.autoEnter - Automatically enter fullscreen on first interaction
- * @returns {Object} Fullscreen state and controls
  */
-export function useFullscreen({ element = 'body', autoEnter = false } = {}) {
+export function useFullscreen({
+  element = 'body',
+  autoEnter = false,
+} = {}) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
+
   const elementRef = useRef(null);
 
-  // Check support on mount
+  // Check browser support
   useEffect(() => {
     setIsSupported(
-      document.fullscreenEnabled ||
-      document.webkitFullscreenEnabled ||
-      document.mozFullScreenEnabled ||
-      document.msFullscreenEnabled
+      !!(
+        document.fullscreenEnabled ||
+        document.webkitFullscreenEnabled ||
+        document.mozFullScreenEnabled ||
+        document.msFullscreenEnabled
+      )
     );
   }, []);
 
-  // Get element reference
+  // Resolve target element
   useEffect(() => {
     if (typeof element === 'string') {
-      elementRef.current = document.querySelector(element);
+      elementRef.current =
+        document.querySelector(element) || document.documentElement;
     } else if (element instanceof HTMLElement) {
       elementRef.current = element;
     } else {
@@ -36,51 +42,36 @@ export function useFullscreen({ element = 'body', autoEnter = false } = {}) {
 
   // Listen for fullscreen changes
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      const isFs = !!(
-        document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement
+    const handleChange = () => {
+      setIsFullscreen(
+        !!(
+          document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.mozFullScreenElement ||
+          document.msFullscreenElement
+        )
       );
-      setIsFullscreen(isFs);
     };
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    document.addEventListener('fullscreenchange', handleChange);
+    document.addEventListener('webkitfullscreenchange', handleChange);
+    document.addEventListener('mozfullscreenchange', handleChange);
+    document.addEventListener('MSFullscreenChange', handleChange);
+
+    handleChange();
 
     return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+      document.removeEventListener('fullscreenchange', handleChange);
+      document.removeEventListener('webkitfullscreenchange', handleChange);
+      document.removeEventListener('mozfullscreenchange', handleChange);
+      document.removeEventListener('MSFullscreenChange', handleChange);
     };
   }, []);
-
-  // Auto-enter fullscreen on first interaction
-  useEffect(() => {
-    if (!autoEnter || !isSupported) return;
-
-    const enterFullscreen = () => {
-      enter();
-      document.removeEventListener('click', enterFullscreen);
-      document.removeEventListener('touchstart', enterFullscreen);
-    };
-
-    document.addEventListener('click', enterFullscreen);
-    document.addEventListener('touchstart', enterFullscreen);
-
-    return () => {
-      document.removeEventListener('click', enterFullscreen);
-      document.removeEventListener('touchstart', enterFullscreen);
-    };
-  }, [autoEnter, isSupported, enter]);
 
   // Enter fullscreen
   const enter = useCallback(async () => {
     const el = elementRef.current;
+
     if (!el || !isSupported) return false;
 
     try {
@@ -93,6 +84,7 @@ export function useFullscreen({ element = 'body', autoEnter = false } = {}) {
       } else if (el.msRequestFullscreen) {
         await el.msRequestFullscreen();
       }
+
       return true;
     } catch (error) {
       console.error('Failed to enter fullscreen:', error);
@@ -102,8 +94,6 @@ export function useFullscreen({ element = 'body', autoEnter = false } = {}) {
 
   // Exit fullscreen
   const exit = useCallback(async () => {
-    if (!isFullscreen) return;
-
     try {
       if (document.exitFullscreen) {
         await document.exitFullscreen();
@@ -114,21 +104,53 @@ export function useFullscreen({ element = 'body', autoEnter = false } = {}) {
       } else if (document.msExitFullscreen) {
         await document.msExitFullscreen();
       }
+
       return true;
     } catch (error) {
       console.error('Failed to exit fullscreen:', error);
       return false;
     }
-  }, [isFullscreen]);
+  }, []);
 
   // Toggle fullscreen
   const toggle = useCallback(async () => {
     if (isFullscreen) {
       return exit();
-    } else {
-      return enter();
     }
+
+    return enter();
   }, [isFullscreen, enter, exit]);
+
+  // Auto-enter on first user interaction
+  useEffect(() => {
+    if (!autoEnter || !isSupported) return;
+
+    const handleFirstInteraction = () => {
+      enter();
+
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('keydown', handleFirstInteraction);
+    };
+
+    document.addEventListener('click', handleFirstInteraction, {
+      once: true,
+    });
+
+    document.addEventListener('touchstart', handleFirstInteraction, {
+      once: true,
+    });
+
+    document.addEventListener('keydown', handleFirstInteraction, {
+      once: true,
+    });
+
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('keydown', handleFirstInteraction);
+    };
+  }, [autoEnter, isSupported, enter]);
 
   return {
     isFullscreen,
@@ -136,7 +158,6 @@ export function useFullscreen({ element = 'body', autoEnter = false } = {}) {
     enter,
     exit,
     toggle,
-    element: elementRef.current,
   };
 }
 
